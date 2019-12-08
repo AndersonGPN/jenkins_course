@@ -12,6 +12,11 @@ pipeline {
                 echo 'Testing..'
             }
         }
+       stage('Autorização manual') {
+            steps {
+                input "Podemos Prosseguir?"
+            }
+        }
         stage('Deploy') {
             steps {
                 echo 'Deploying....'
@@ -19,12 +24,10 @@ pipeline {
         }
     }
     post {
-        success {
-            emailext(
-                subject: "${env.JOB_NAME} na build [${env.BUILD_NUMBER}] foi deployado com sucesso :D",
-                body: "Verifique a saída da console do Job ${env.JOB_NAME} em [${env.BUILD_URL}] ",
-                to: "orionzb@gmail.com"
-            )
+        always {
+            mail to: 'andersonzb@hotmail.com', from: 'jenkins@example.com',
+                subject: "Example Build: ${env.JOB_NAME} - Status", 
+                body: "${currentBuild.currentResult}: Job - \"${env.JOB_NAME}\" build: ${env.BUILD_NUMBER}\n\nView the log at:\n ${env.BUILD_URL}\n\nBlue Ocean:\n${env.RUN_DISPLAY_URL}"
         }   
     }
 } 
